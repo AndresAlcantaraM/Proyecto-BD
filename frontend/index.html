@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicación de Mensajería - Ingreso</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="login-container" id="loginContainer">
+        <img src="https://th.bing.com/th/id/OIP.eWlGD3SHazEJPmXu9LnOywHaHa?rs=1&pid=ImgDetMain" alt="Logo" class="logo" width="280" height="180">
+        <h2>Aplicación de Mensajería</h2>
+        <div class="login-box">
+            <h3>Ingreso al sistema</h3>
+            <form id="loginForm">
+                <div class="input-group">
+                    <span class="input-icon"><i class="fas fa-user"></i></span>
+                    <input type="text" id="username" name="username" placeholder="Usuario" required>
+                </div>
+                <div class="input-group">
+                    <span class="input-icon"><i class="fas fa-lock"></i></span>
+                    <input type="password" id="password" name="password" placeholder="Contraseña" required>
+                </div>
+                <button type="submit">Ingresar</button>
+            </form>
+        </div>
+    </div>
+    <div class="dashboard-container" id="dashboardContainer" style="display: none;">
+        <div class="sidebar">
+            <h2>Panel de Navegación </h2>
+            <ul>
+                <li><a href="#"><i class="fas fa-users"></i> Clientes</a></li>
+                <li><a href="#"><i class="fas fa-motorcycle"></i> Mensajeros</a></li>
+                <li><a href="#"><i class="fas fa-box"></i> Servicios</a></li>
+                <li><a href="#"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <h2> Bienvenido</h2>
+            <p>Contenido principal aquí.</p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
