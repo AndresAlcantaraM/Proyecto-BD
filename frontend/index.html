@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplicación de Mensajería - Ingreso</title>
+    <title>Aplicación de Mensajería</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -26,19 +26,145 @@
             </form>
         </div>
     </div>
+
     <div class="dashboard-container" id="dashboardContainer" style="display: none;">
         <div class="sidebar">
-            <h2>Panel de Navegación </h2>
+            <h2>Panel de Navegación</h2>
             <ul>
-                <li><a href="#"><i class="fas fa-users"></i> Clientes</a></li>
-                <li><a href="#"><i class="fas fa-motorcycle"></i> Mensajeros</a></li>
-                <li><a href="#"><i class="fas fa-box"></i> Servicios</a></li>
-                <li><a href="#"><i class="fas fa-user-cog"></i> Usuarios</a></li>
+                <li><a href="#" onclick="showSection('clients')"><i class="fas fa-users"></i> Clientes</a></li>
+                <li><a href="#" onclick="showSection('couriers')"><i class="fas fa-motorcycle"></i> Mensajeros</a></li>
+                <li><a href="#" onclick="showSection('services')"><i class="fas fa-box"></i> Servicios</a></li>
+                <li><a href="#" onclick="showSection('users')"><i class="fas fa-user-cog"></i> Usuarios</a></li>
             </ul>
         </div>
         <div class="main-content">
-            <h2> Bienvenido</h2>
-            <p>Contenido principal aquí.</p>
+            <div id="clients" class="section" style="display: none;">
+                <h2>Gestionar Clientes</h2>
+                <form id="clientsForm">
+                    <div class="input-group">
+                        <label for="client_id">ID Cliente:</label>
+                        <input type="text" id="client_id" name="client_id">
+                    </div>
+                    <div class="input-group">
+                        <label for="client_name">Nombre:</label>
+                        <input type="text" id="client_name" name="client_name">
+                    </div>
+                    <div class="input-group">
+                        <label for="client_address">Dirección:</label>
+                        <input type="text" id="client_address" name="client_address">
+                    </div>
+                    <div class="input-group">
+                        <label for="client_city">Ciudad:</label>
+                        <input type="text" id="client_city" name="client_city">
+                    </div>
+                    <div class="input-group">
+                        <label for="client_email">Email:</label>
+                        <input type="email" id="client_email" name="client_email">
+                    </div>
+                    <div class="input-group">
+                        <label for="client_phone">Teléfono:</label>
+                        <input type="tel" id="client_phone" name="client_phone">
+                    </div>
+                    <button type="button" onclick="addClient()">Agregar Cliente</button>
+                </form>
+            </div>
+
+            <div id="couriers" class="section" style="display: none;">
+                <h2>Gestionar Mensajeros</h2>
+                <form id="couriersForm">
+                    <div class="input-group">
+                        <label for="courier_id">ID Mensajero:</label>
+                        <input type="text" id="courier_id" name="courier_id">
+                    </div>
+                    <div class="input-group">
+                        <label for="courier_name">Nombre:</label>
+                        <input type="text" id="courier_name" name="courier_name">
+                    </div>
+                    <div class="input-group">
+                        <label for="courier_address">Dirección:</label>
+                        <input type="text" id="courier_address" name="courier_address">
+                    </div>
+                    <div class="input-group">
+                        <label for="courier_email">Email:</label>
+                        <input type="email" id="courier_email" name="courier_email">
+                    </div>
+                    <div class="input-group">
+                        <label for="courier_phone">Teléfono:</label>
+                        <input type="tel" id="courier_phone" name="courier_phone">
+                    </div>
+                    <button type="button" onclick="addCourier()">Agregar Mensajero</button>
+                </form>
+            </div>
+
+            <div id="services" class="section" style="display: none;">
+                <h2>Gestionar Servicios</h2>
+                <form id="servicesForm">
+                    <div class="input-group">
+                        <label for="service_code">Código Servicio:</label>
+                        <input type="text" id="service_code" name="service_code">
+                    </div>
+                    <div class="input-group">
+                        <label for="service_date">Fecha Solicitud:</label>
+                        <input type="date" id="service_date" name="service_date">
+                    </div>
+                    <div class="input-group">
+                        <label for="service_time">Hora Solicitud:</label>
+                        <input type="time" id="service_time" name="service_time">
+                    </div>
+                    <div class="input-group">
+                        <label for="service_origin">Origen:</label>
+                        <input type="text" id="service_origin" name="service_origin">
+                    </div>
+                    <div class="input-group">
+                        <label for="service_destination">Destino:</label>
+                        <input type="text" id="service_destination" name="service_destination">
+                    </div>
+                    <div class="input-group">
+                        <label for="service_city">Ciudad:</label>
+                        <input type="text" id="service_city" name="service_city">
+                    </div>
+                    <div class="input-group">
+                        <label for="service_description">Descripción:</label>
+                        <input type="text" id="service_description" name="service_description">
+                    </div>
+                    <div class="input-group">
+                        <label for="service_transport">Tipo de Transporte:</label>
+                        <input type="text" id="service_transport" name="service_transport">
+                    </div>
+                    <div class="input-group">
+                        <label for="service_packages">Número de Paquetes:</label>
+                        <input type="number" id="service_packages" name="service_packages">
+                    </div>
+                    <button type="button" onclick="addService()">Agregar Servicio</button>
+                </form>
+            </div>
+
+            <div id="users" class="section" style="display: none;">
+                <h2>Gestionar Usuarios</h2>
+                <form id="usersForm">
+                    <div class="input-group">
+                        <label for="user_login">Login:</label>
+                        <input type="text" id="user_login" name="user_login">
+                    </div>
+                    <div class="input-group">
+                        <label for="user_password">Contraseña:</label>
+                        <input type="password" id="user_password" name="user_password">
+                    </div>
+                    <div class="input-group">
+                        <label for="user_address">Dirección:</label>
+                        <input type="text" id="user_address" name="user_address">
+                    </div>
+                    <div class="input-group">
+                        <label for="user_email">Email:</label>
+                        <input type="email" id="user_email" name="user_email">
+                    </div>
+                    <div class="input-group">
+                        <label for="user_phone">Teléfono:</label>
+                        <input type="tel" id="user_phone" name="user_phone">
+                    </div>
+                    <button type="button" onclick="addUser()">Agregar Usuario</button>
+                </form>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
