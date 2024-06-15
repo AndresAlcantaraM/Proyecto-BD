@@ -5,12 +5,51 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     var password = document.getElementById('password').value;
 
     if (username && password) {
-        document.getElementById('loginContainer').style.display = 'none';
-        document.getElementById('dashboardContainer').style.display = 'flex';
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json(); // Parseamos la respuesta JSON
+            } else {
+                throw new Error('Invalid credentials');
+            }
+        })
+        .then(data => {
+            if (data.role === 'Admin') {
+                showAdminDashboard(); // Mostrar todas las funcionalidades para admin
+            } else {
+                showClientDashboard(); // Mostrar solo registrar servicio para usuarios normales
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Invalid credentials');
+        });
     } else {
         alert('Por favor, ingrese el nombre de usuario y la contraseña.');
     }
 });
+
+function showAdminDashboard() {
+    document.getElementById('loginContainer').style.display = 'none';
+    document.getElementById('dashboardContainer').style.display = 'flex';
+}
+
+function showClientDashboard() {
+    document.getElementById('loginContainer').style.display = 'none';
+    document.getElementById('dashboardContainer').style.display = 'flex';
+    var sections = document.querySelectorAll('.section');
+    sections.forEach(function(section) {
+        section.style.display = 'none';
+    });
+    document.getElementById('serviceSection').style.display = 'block';
+}
+
 
 function showSection(sectionId) {
     var sections = document.querySelectorAll('.section');
@@ -78,11 +117,17 @@ function addUser() {
         password: document.getElementById('user_password').value,
         address: document.getElementById('user_address').value,
         email: document.getElementById('user_email').value,
-        phone: document.getElementById('user_phone').value
+        phone: document.getElementById('user_phone').value,
+        role: document.getElementById('user_rol').value
     };
     sendData('/addUser', user);
 }
 
-
-
-
+function modifyService() {
+    var service = {
+        codeS: document.getElementById('codeS').value,
+        codeM: document.getElementById('codeM').value,
+        status: document.getElementById('modify_service_status').value,
+    };
+    sendData('/modifyService', service);
+}

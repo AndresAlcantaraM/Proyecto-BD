@@ -23,19 +23,15 @@ VALUES
 ('Sucursal Sur', 'Calle Sur 456, Ciudad B', '789123456', 2);
 
 -- Insertar datos en la tabla usuario
-INSERT INTO usuario (login, contrasena, email, direccion, telefonoDeContacto, cIdentificacion)
+INSERT INTO usuario (rol, login, contrasena, email, direccion, telefonoDeContacto, cIdentificacion)
 VALUES
-('user1', 'password1', 'user1@example.com', 'Calle 1, Ciudad A', '555666777', 1),
-('user2', 'password2', 'user2@example.com', 'Calle 2, Ciudad B', '888999000', 2);
-
--- Insertar datos en la tabla estado
-INSERT INTO estado (identificacion, estado, fechaYHoraDelEstado)
-VALUES
-(1, 'Recogido por el mensajero', '2024-05-21 10:00:00'),
-(2, 'Entregado', '2024-05-21 12:00:00');
+('User', 'user1', 'password1', 'user1@example.com', 'Calle 1, Ciudad A', '555666777', 1),
+('User', 'user2', 'password2', 'user2@example.com', 'Calle 2, Ciudad B', '888999000', 2),
+('Admin', 'admin1', '1234', 'admin1@example.com', NULL, NULL, NULL),
+('Admin', 'admin2', '5678', 'admin2@example.com', NULL, NULL, NULL);
 
 -- Insertar datos en la tabla servicio
-INSERT INTO servicio (codigo, fechaYHoraDeSolicitud, origen, destino, descripcion, numeroDePaquetes, tipoDeTransporte, cIdentificacion, eIdentificacion)
+INSERT INTO servicio (codigo, fechaYHoraDeSolicitud, origen, destino, descripcion, numeroDePaquetes, tipoDeTransporte, estado, fechaYHoraDelEstado, cIdentificacion)
 VALUES
-(1, '2024-05-21 09:00:00', 'Ciudad A', 'Ciudad B', 'Entrega de documentos', 1, 'Moto', 1, 1),
-(2, '2024-05-21 11:00:00', 'Ciudad B', 'Ciudad A', 'Entrega de paquete', 2, 'Bicicleta', 2, 2);
+(1, '2024-05-21 09:00:00', 'Ciudad A', 'Ciudad B', 'Entrega de documentos', 1, 'Moto', 'Solicitado', '2024-05-21 10:00:00', 1),
+(2, '2024-05-21 11:00:00', 'Ciudad B', 'Ciudad A', 'Entrega de paquete', 2, 'Bicicleta', 'Solicitado', '2024-05-21 12:00:00', 2);

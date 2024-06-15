@@ -31,12 +31,16 @@ body {
     height: 100%;
     width: 200px;
     padding-top: 20px;
+    z-index: 1;
+    background-color: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .main-content {
-    margin-left: 220px;
+    margin-left: 240px;
     padding: 20px;
-    width: calc(100% - 220px);
+    width: calc(100% - 240px);
+    overflow: hidden;
 }
 
 .input-group {
@@ -69,4 +73,8 @@ button:hover {
 
 .section {
     display: none;
+}
+
+.section h2 {
+    text-align: center;
 }

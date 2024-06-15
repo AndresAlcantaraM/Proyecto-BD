@@ -1,6 +1,6 @@
 CREATE TABLE mensajero(
 	identificacion INT PRIMARY KEY,
-	nombre VARCHAR(100) ,
+	nombre VARCHAR(100) ,	
 	direccion VARCHAR(100),
 	email VARCHAR(100) ,
 	telefonoDeContacto VARCHAR(100),
@@ -33,19 +33,14 @@ CREATE TABLE sucursal(
 );
 
 CREATE TABLE usuario(
-	login VARCHAR(100) ,
+	rol VARCHAR(100),
+	login VARCHAR(100),
 	contrasena VARCHAR(100),
 	email VARCHAR(100),
 	direccion VARCHAR(100),
 	telefonoDeContacto VARCHAR(100),
 	cIdentificacion INT,
 	FOREIGN KEY(cIdentificacion) REFERENCES cliente(identificacion)
-);
-
-CREATE TABLE estado(
-	identificacion INT PRIMARY KEY,
-	estado VARCHAR(100),
-	fechaYHoraDelEstado TIMESTAMP
 );
 
 CREATE TABLE servicio(
@@ -56,8 +51,8 @@ CREATE TABLE servicio(
 	descripcion TEXT,
 	numeroDePaquetes INT,
 	tipoDeTransporte VARCHAR(100),
+	estado VARCHAR(100),
+	fechaYHoraDelEstado TIMESTAMP,
 	cIdentificacion INT,
-	eIdentificacion INT,
-	FOREIGN KEY (cIdentificacion) REFERENCES cliente(identificacion),
-	FOREIGN KEY (eIdentificacion) REFERENCES estado(identificacion)
+	FOREIGN KEY (cIdentificacion) REFERENCES cliente(identificacion)
 );

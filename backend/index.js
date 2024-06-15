@@ -28,13 +28,36 @@ function connect(callback) {
 // Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '..', 'frontend'))); // Cambiado a '..' para servir archivos estáticos desde la carpeta frontend
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 // Rutas
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
 
+// Ruta para iniciar sesión
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    
+    try {
+        const result = await pool.query(
+            'SELECT * FROM usuario WHERE login = $1 AND contrasena = $2',
+            [username, password]
+        );
+
+        if (result.rows.length > 0) {
+            const user = result.rows[0];
+            res.status(200).json({ message: 'Login successful', role: user.rol });
+        } else {
+            res.status(401).send('Invalid credentials');
+        }
+    } catch (err) {
+        console.error('Error querying the database:', err);
+        res.status(500).send('Internal server error');
+    }
+});
+
+// Rutas para registrar cliente, mensajero, servicio y usuario
 app.post('/addClient', (req, res) => {
     const { id, name, address, city, email, phone } = req.body;
     connect((err, client, done) => {
@@ -44,12 +67,11 @@ app.post('/addClient', (req, res) => {
                      (err) => {
                          done();
                          if (err) return res.status(500).send(err.message);
-                         res.status(200).send('Client added');
+                         res.status(200).send('Cliente añadido');
                      });
     });
 });
 
-// Similar routes for addCourier, addService, addUser
 app.post('/addCourier', (req, res) => {
     const { id, name, address, email, phone, transport } = req.body;
     connect((err, client, done) => {
@@ -67,24 +89,36 @@ app.post('/addCourier', (req, res) => {
 app.post('/addService', (req, res) => {
     const { code, date, time, origin, destination, city, description, transport, packages } = req.body;
     const timestamp = `${date} ${time}`;
+    
+    const queryDate = new Date().toLocaleString("en-US", {timeZone: "America/Bogota"});
+    
     connect((err, client, done) => {
         if (err) return res.status(500).send(err.message);
-        client.query('INSERT INTO servicio (codigo, fechaYHoraDeSolicitud, origen, destino, descripcion, numeroDePaquetes, tipoDeTransporte, cIdentificacion, eIdentificacion) VALUES ($1, $2, $3, $4, $5, $6, $7, NULL, NULL)', 
-                     [code, timestamp, origin, destination, description, packages, transport], 
-                     (err) => {
-                         done();
-                         if (err) return res.status(500).send(err.message);
-                         res.status(200).send('Service added');
-                     });
+
+        const query = `
+            INSERT INTO servicio 
+            (codigo, fechaYHoraDeSolicitud, origen, destino, descripcion, numeroDePaquetes, tipoDeTransporte, estado, fechaYHoraDelEstado, cIdentificacion) 
+            VALUES 
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, NULL)
+        `;
+        const values = [code, timestamp, origin, destination, description, packages, transport, 'Solicitado', queryDate];
+
+        client.query(query, values, (err) => {
+            done();
+            if (err) {
+                return res.status(500).send(err.message);
+            }
+            res.status(200).send('Service added');
+        });
     });
 });
 
 app.post('/addUser', (req, res) => {
-    const { login, password, address, email, phone } = req.body;
+    const { login, password, address, email, phone, role} = req.body;
     connect((err, client, done) => {
         if (err) return res.status(500).send(err.message);
-        client.query('INSERT INTO usuario (login, contrasena, direccion, email, telefonoDeContacto, cIdentificacion) VALUES ($1, $2, $3, $4, $5, NULL)', 
-                     [login, password, address, email, phone], 
+        client.query('INSERT INTO usuario (rol, login, contrasena, direccion, email, telefonoDeContacto, cIdentificacion) VALUES ($1, $2, $3, $4, $5, $6, NULL)', 
+                     [role, login, password, address, email, phone], 
                      (err) => {
                          done();
                          if (err) return res.status(500).send(err.message);
@@ -93,7 +127,31 @@ app.post('/addUser', (req, res) => {
     });
 });
 
+app.post('/modifyService', async (req, res) => {
+    const { codeS, status } = req.body;
+    const queryDate = new Date().toLocaleString("en-US", {timeZone: "America/Bogota"});
+
+    connect((err, client, done) => {
+        if (err) return res.status(500).send(err.message);
+
+        const query = `
+            UPDATE servicio 
+            SET estado = $1, fechaYHoraDelEstado = $2
+            WHERE codigo = $3
+        `;
+        const values = [status, queryDate, codeS];
+
+        client.query(query, values, (err) => {
+            done();
+            if (err) {
+                return res.status(500).send(err.message);
+            }
+            res.status(200).send('Servicio modificado');
+        });
+    });
+});
+
+// Iniciar el servidor
 app.listen(3000, () => {
     console.log('Listening on port 3000');
 });
-
