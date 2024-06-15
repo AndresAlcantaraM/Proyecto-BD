@@ -38,24 +38,30 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
 function showAdminDashboard() {
     document.getElementById('loginContainer').style.display = 'none';
     document.getElementById('dashboardContainer').style.display = 'flex';
+    hideAllSections();
 }
 
 function showClientDashboard() {
     document.getElementById('loginContainer').style.display = 'none';
     document.getElementById('dashboardContainer').style.display = 'flex';
-    var sections = document.querySelectorAll('.section');
-    sections.forEach(function(section) {
-        section.style.display = 'none';
-    });
-    document.getElementById('serviceSection').style.display = 'block';
+    hideAllSections();
+    
+    // Ocultar botones que no son necesarios para usuarios normales
+    document.querySelector('button[onclick="showSection(\'clientSection\')"]').style.display = 'none';
+    document.querySelector('button[onclick="showSection(\'mensajeroSection\')"]').style.display = 'none';
+    document.querySelector('button[onclick="showSection(\'userSection\')"]').style.display = 'none';
+    document.querySelector('button[onclick="showSection(\'modifySection\')"]').style.display = 'none';
 }
 
-
-function showSection(sectionId) {
+function hideAllSections() {
     var sections = document.querySelectorAll('.section');
     sections.forEach(function(section) {
         section.style.display = 'none';
     });
+}
+
+function showSection(sectionId) {
+    hideAllSections();
     document.getElementById(sectionId).style.display = 'block';
 }
 

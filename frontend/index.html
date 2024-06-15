@@ -151,34 +151,29 @@
                     <input type="text" id="user_phone" name="user_phone">
                 </div>
                 <div class="input-group">
-                    <label for="user_rol">Tipo de usuario:</label>
+                    <label for="user_rol">Rol:</label>
                     <select id="user_rol" name="user_rol">
-                        <option value="Cliente">Cliente</option>
-                        <option value="Admin">Administrador</option>
+                        <option value="Admin">Admin</option>
+                        <option value="User">User</option>
                     </select>
                 </div>
                 <button type="button" onclick="addUser()">Registrar Usuario</button>
             </div>
-            <!--Aqui-->
             <div id="modifySection" class="section">
-                <h2>Modificar servicio</h2>
+                <h2>Modificar Servicio</h2>
                 <div class="input-group">
-                    <label for="codeS">Código del servicio:</label>
+                    <label for="codeS">Código Servicio:</label>
                     <input type="text" id="codeS" name="codeS">
                 </div>
                 <div class="input-group">
-                    <label for="codeM">Código del mensajero:</label>
+                    <label for="codeM">Código Mensajero:</label>
                     <input type="text" id="codeM" name="codeM">
                 </div>
                 <div class="input-group">
-                    <label for="modify_service_status">Estado del Pedido:</label>
-                    <select id="modify_service_status" name="modify_service_status">
-                        <option value="Solicitado">Solicitado</option>
-                        <option value="Recogido por el Mensajero">Recogido por el Mensajero</option>
-                        <option value="Entregado">Entregado</option>
-                    </select>
+                    <label for="modify_service_status">Estado:</label>
+                    <input type="text" id="modify_service_status" name="modify_service_status">
                 </div>
-                <button type="button" onclick="modifyService()">Actualizar Servicio</button>
+                <button type="button" onclick="modifyService()">Modificar Servicio</button>
             </div>
         </div>
     </div>
