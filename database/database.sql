@@ -1,6 +1,6 @@
 CREATE TABLE mensajero(
 	identificacion INT PRIMARY KEY,
-	nombre VARCHAR(100) ,	
+	nombre VARCHAR(100) ,
 	direccion VARCHAR(100),
 	email VARCHAR(100) ,
 	telefonoDeContacto VARCHAR(100),
@@ -17,12 +17,14 @@ CREATE TABLE cliente(
 );
 
 CREATE TABLE mensajero_cliente(
-	identificacion INT PRIMARY KEY,
 	mIdentificacion INT,
-	cIdentificacion INT, 
+	cIdentificacion INT,
+	PRIMARY KEY(mIdentificacion, cIdentificacion),
 	FOREIGN KEY(mIdentificacion) REFERENCES mensajero(identificacion),
 	FOREIGN KEY(cIdentificacion) REFERENCES cliente(identificacion)
 );
+
+
 
 CREATE TABLE sucursal(
 	nombre VARCHAR(100) ,
@@ -31,7 +33,6 @@ CREATE TABLE sucursal(
 	cIdentificacion INT,
 	FOREIGN KEY(cIdentificacion) REFERENCES cliente(identificacion)
 );
-
 CREATE TABLE usuario(
 	rol VARCHAR(100),
 	login VARCHAR(100),
@@ -42,6 +43,7 @@ CREATE TABLE usuario(
 	cIdentificacion INT,
 	FOREIGN KEY(cIdentificacion) REFERENCES cliente(identificacion)
 );
+
 
 CREATE TABLE servicio(
 	codigo INT PRIMARY KEY,
@@ -54,5 +56,7 @@ CREATE TABLE servicio(
 	estado VARCHAR(100),
 	fechaYHoraDelEstado TIMESTAMP,
 	cIdentificacion INT,
+	mIdentificacion INT,
+	FOREIGN KEY(mIdentificacion) REFERENCES mensajero(identificacion),
 	FOREIGN KEY (cIdentificacion) REFERENCES cliente(identificacion)
 );

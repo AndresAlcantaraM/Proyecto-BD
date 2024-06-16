@@ -1,4 +1,3 @@
--- Insertar datos en la tabla mensajero
 INSERT INTO mensajero (identificacion, nombre, direccion, email, telefonoDeContacto, medioDeTransporte)
 VALUES
 (1, 'Juan Pérez', 'Calle 123, Ciudad A', 'juan.perez@example.com', '123456789', 'Moto'),
@@ -11,10 +10,10 @@ VALUES
 (2, 'Juan García', 'Calle Secundaria 789, Ciudad B', 'juan.garcia@example.com', '444555666', 'Ciudad B');
 
 -- Insertar datos en la tabla mensajero_cliente
-INSERT INTO mensajero_cliente (identificacion, mIdentificacion, cIdentificacion)
+INSERT INTO mensajero_cliente (mIdentificacion, cIdentificacion)
 VALUES
-(1, 1, 1),
-(2, 2, 2);
+(1, 1),
+(2, 2);
 
 -- Insertar datos en la tabla sucursal
 INSERT INTO sucursal (nombre, direccion, telefonoDeContacto, cIdentificacion)
@@ -31,7 +30,7 @@ VALUES
 ('Admin', 'admin2', '5678', 'admin2@example.com', NULL, NULL, NULL);
 
 -- Insertar datos en la tabla servicio
-INSERT INTO servicio (codigo, fechaYHoraDeSolicitud, origen, destino, descripcion, numeroDePaquetes, tipoDeTransporte, estado, fechaYHoraDelEstado, cIdentificacion)
+INSERT INTO servicio (codigo, fechaYHoraDeSolicitud, origen, destino, descripcion, numeroDePaquetes, tipoDeTransporte, estado, fechaYHoraDelEstado, cIdentificacion, midentificacion)
 VALUES
-(1, '2024-05-21 09:00:00', 'Ciudad A', 'Ciudad B', 'Entrega de documentos', 1, 'Moto', 'Solicitado', '2024-05-21 10:00:00', 1),
-(2, '2024-05-21 11:00:00', 'Ciudad B', 'Ciudad A', 'Entrega de paquete', 2, 'Bicicleta', 'Solicitado', '2024-05-21 12:00:00', 2);
+(1, '2024-05-21 09:00:00', 'Ciudad A', 'Ciudad B', 'Entrega de documentos', 1, 'Moto', 'Solicitado', '2024-05-21 10:00:00', 1, NULL),
+(2, '2024-05-21 11:00:00', 'Ciudad B', 'Ciudad A', 'Entrega de paquete', 2, 'Bicicleta', 'Solicitado', '2024-05-21 12:00:00', 2, NULL);

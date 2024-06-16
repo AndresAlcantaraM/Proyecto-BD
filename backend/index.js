@@ -3,6 +3,8 @@ const app = express();
 const path = require('path');
 const bodyParser = require('body-parser');
 const Pool = require('pg-pool');
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
 
 // Configuración de la base de datos
 const config = {
@@ -72,6 +74,50 @@ app.post('/addClient', (req, res) => {
     });
 });
 
+// Buscar cliente por ID
+app.get('/getClient/:id', (req, res) => {
+    const id = req.params.id;
+    connect((err, client, done) => {
+        if (err) return res.status(500).send(err.message);
+        client.query('SELECT * FROM cliente WHERE identificacion = $1', [id], (err, result) => {
+            done();
+            if (err) return res.status(500).send(err.message);
+            if (result.rows.length === 0) {
+                return res.status(404).send('Cliente no encontrado');
+            }
+            res.status(200).json(result.rows[0]);
+        });
+    });
+});
+
+app.put('/updateClient/:id', (req, res) => {
+    const clientId = req.params.id;
+    const { name, address, city, email, phone } = req.body;
+    connect((err, client, done) => {
+        if (err) return res.status(500).send(err.message);
+        client.query('UPDATE cliente SET nombre = $1, direccion = $2, ciudad = $3, email = $4, telefonoDeContacto = $5 WHERE identificacion = $6', 
+                     [name, address, city, email, phone, clientId], 
+                     (err) => {
+                         done();
+                         if (err) return res.status(500).send(err.message);
+                         res.status(200).send('Cliente actualizado');
+                     });
+    });
+});
+
+app.delete('/deleteClient/:id', (req, res) => {
+    const { id } = req.params;
+    connect((err, client, done) => {
+        if (err) return res.status(500).send(err.message);
+        client.query('DELETE FROM cliente WHERE identificacion = $1', [id], (err) => {
+            done();
+            if (err) return res.status(500).send(err.message);
+            res.status(200).send('Cliente eliminado');
+        });
+    });
+});
+
+
 app.post('/addCourier', (req, res) => {
     const { id, name, address, email, phone, transport } = req.body;
     connect((err, client, done) => {
@@ -86,8 +132,47 @@ app.post('/addCourier', (req, res) => {
     });
 });
 
+
+//Actualizar servicio con el mensajero
+app.post('/assignmessenger', (req, res) => {
+    const {idService, idMessenger} = req.body;
+    connect((err, client, done) => {
+        if (err) return res.status(500).send(err.message);
+
+        const query = `
+            UPDATE servicio 
+            SET mIdentificacion = $2
+            WHERE codigo = $1
+        `;
+        const values = [idService,idMessenger];
+
+        client.query(query, values, (err) => {
+            done();
+            if (err) {
+                return res.status(500).send(err.message);
+            }
+            res.status(200).send('Mensajero Asignado');
+        });
+    });
+});
+
+//Insertar la un mensajero relacionado con un cliente
+app.post('/assignmessengerClient', (req, res) => {
+    const { idMessenger,idClient} = req.body;
+    connect((err, client, done) => {
+        if (err) return res.status(500).send(err.message);
+        client.query('INSERT INTO mensajero_cliente (mIdentificacion, cIdentificacion) VALUES ($1, $2)', 
+                     [idMessenger,idClient], 
+                     (err) => {
+                         done();
+                         if (err) return res.status(500).send(err.message);
+                         res.status(200).send('Mensajero relacionado');
+                     });
+    });
+});
+
 app.post('/addService', (req, res) => {
-    const { code, date, time, origin, destination, city, description, transport, packages } = req.body;
+    const { code, date, time, origin, destination, description, transport, packages, IdClient } = req.body;
     const timestamp = `${date} ${time}`;
     
     const queryDate = new Date().toLocaleString("en-US", {timeZone: "America/Bogota"});
@@ -99,9 +184,9 @@ app.post('/addService', (req, res) => {
             INSERT INTO servicio 
             (codigo, fechaYHoraDeSolicitud, origen, destino, descripcion, numeroDePaquetes, tipoDeTransporte, estado, fechaYHoraDelEstado, cIdentificacion) 
             VALUES 
-            ($1, $2, $3, $4, $5, $6, $7, $8, $9, NULL)
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         `;
-        const values = [code, timestamp, origin, destination, description, packages, transport, 'Solicitado', queryDate];
+        const values = [code, timestamp, origin, destination, description, packages, transport, 'Solicitado', queryDate, IdClient];
 
         client.query(query, values, (err) => {
             done();
@@ -150,6 +235,116 @@ app.post('/modifyService', async (req, res) => {
         });
     });
 });
+
+app.get('/monitorService/:codigo', (req, res) => {
+    const codigo = req.params.codigo;
+    connect((err, client, done) => {
+        if (err) return res.status(500).send(err.message);
+        client.query('SELECT estado, fechaYHoraDelEstado, descripcion FROM servicio WHERE codigo = $1', [codigo], (err, result) => {
+            done();
+            if (err) return res.status(500).send(err.message);
+            if (result.rows.length === 0) {
+                return res.status(404).send('Servicio no encontrado');
+            }
+            res.status(200).json(result.rows[0]);
+        });
+    });
+});
+
+// Ruta para generar reporte de pedidos por cliente y mes
+app.get('/reportePedidosPorCliente', async (req, res) => {
+    const { mes, anio } = req.query;
+    const query = `
+        SELECT c.nombre AS cliente, s.codigo, s.fechaYHoraDeSolicitud, s.origen, s.destino, s.descripcion
+        FROM servicio s
+        JOIN cliente c ON s.cIdentificacion = c.identificacion
+        WHERE EXTRACT(MONTH FROM s.fechaYHoraDeSolicitud) = $1
+        AND EXTRACT(YEAR FROM s.fechaYHoraDeSolicitud) = $2
+        ORDER BY c.nombre, s.fechaYHoraDeSolicitud
+    `;
+
+    try {
+        const result = await pool.query(query, [mes, anio]);
+        const doc = new PDFDocument();
+        const filePath = path.join(__dirname, 'reportePedidosPorCliente.pdf');
+
+        doc.pipe(fs.createWriteStream(filePath));
+        doc.fontSize(16).text('Reporte de Pedidos por Cliente', { align: 'center' });
+        doc.moveDown();
+        result.rows.forEach(row => {
+            doc.fontSize(12).text(`Cliente: ${row.cliente}`);
+            doc.text(`Código: ${row.codigo}`);
+            doc.text(`Fecha y Hora de Solicitud: ${Date(row.fechaYHoraDeSolicitud)}`);
+            doc.text(`Origen: ${row.origen}`);
+            doc.text(`Destino: ${row.destino}`);
+            doc.text(`Descripción: ${row.descripcion}`);
+            doc.moveDown();
+        });
+        doc.end();
+
+        doc.on('finish', function() {
+            res.download(filePath, 'reportePedidosPorCliente.pdf', function(err) {
+                if (err) {
+                    console.error('Error downloading the file:', err);
+                    res.status(500).send('Error al generar el reporte.');
+                } else {
+                    fs.unlinkSync(filePath);  // Eliminar el archivo después de que se haya descargado
+                }
+            });
+        });
+    } catch (err) {
+        console.error('Error querying the database:', err);
+        res.status(500).send('Internal server error');
+    }
+});
+
+// Ruta para generar reporte de pedidos atendidos por mensajero en un mes especificado
+app.get('/reportePedidosPorMensajero', async (req, res) => {
+    const { mes, anio } = req.query;
+    const query = `
+        SELECT m.nombre AS mensajero, s.codigo, s.fechaYHoraDeSolicitud, s.origen, s.destino, s.descripcion
+        FROM servicio s
+        JOIN mensajero m ON s.mIdentificacion = m.identificacion
+        WHERE EXTRACT(MONTH FROM s.fechaYHoraDeSolicitud) = $1
+        AND EXTRACT(YEAR FROM s.fechaYHoraDeSolicitud) = $2
+        ORDER BY m.nombre, s.fechaYHoraDeSolicitud
+    `;
+
+    try {
+        const result = await pool.query(query, [mes, anio]);
+        const doc = new PDFDocument();
+        const filePath = path.join(__dirname, 'reportePedidosPorMensajero.pdf');
+
+        doc.pipe(fs.createWriteStream(filePath));
+        doc.fontSize(16).text('Reporte de Pedidos por Mensajero', { align: 'center' });
+        doc.moveDown();
+        result.rows.forEach(row => {
+            doc.fontSize(12).text(`Mensajero: ${row.mensajero}`);
+            doc.text(`Código: ${row.codigo}`);
+            doc.text(`Fecha y Hora de Solicitud: ${date(row.fechaYHoraDeSolicitud)}`);
+            doc.text(`Origen: ${row.origen}`);
+            doc.text(`Destino: ${row.destino}`);
+            doc.text(`Descripción: ${row.descripcion}`);
+            doc.moveDown();
+        });
+        doc.end();
+
+        doc.on('finish', function() {
+            res.download(filePath, 'reportePedidosPorMensajero.pdf', function(err) {
+                if (err) {
+                    console.error('Error downloading the file:', err);
+                    res.status(500).send('Error al generar el reporte.');
+                } else {
+                    fs.unlinkSync(filePath);  // Eliminar el archivo después de que se haya descargado
+                }
+            });
+        });
+    } catch (err) {
+        console.error('Error querying the database:', err);
+        res.status(500).send('Internal server error');
+    }
+});
+
 
 // Iniciar el servidor
 app.listen(3000, () => {
