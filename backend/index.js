@@ -4,14 +4,13 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const Pool = require('pg-pool');
 const PDFDocument = require('pdfkit');
-const fs = require('fs');
 
 // Configuración de la base de datos
 const config = {
     user: "postgres",
     database: "postgres",
-    password: "pg123",
-    host: "192.168.1.6",
+    password: "1234",
+    host: "172.25.98.220",
     port: 5432,
     max: 10,
     idleTimeoutMillis: 30000,
@@ -31,6 +30,7 @@ function connect(callback) {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
+
 
 // Rutas
 app.get('/', (req, res) => {
@@ -251,100 +251,67 @@ app.get('/monitorService/:codigo', (req, res) => {
     });
 });
 
-// Ruta para generar reporte de pedidos por cliente y mes
-app.get('/reportePedidosPorCliente', async (req, res) => {
-    const { mes, anio } = req.query;
-    const query = `
-        SELECT c.nombre AS cliente, s.codigo, s.fechaYHoraDeSolicitud, s.origen, s.destino, s.descripcion
-        FROM servicio s
-        JOIN cliente c ON s.cIdentificacion = c.identificacion
-        WHERE EXTRACT(MONTH FROM s.fechaYHoraDeSolicitud) = $1
-        AND EXTRACT(YEAR FROM s.fechaYHoraDeSolicitud) = $2
-        ORDER BY c.nombre, s.fechaYHoraDeSolicitud
-    `;
-
-    try {
-        const result = await pool.query(query, [mes, anio]);
-        const doc = new PDFDocument();
-        const filePath = path.join(__dirname, 'reportePedidosPorCliente.pdf');
-
-        doc.pipe(fs.createWriteStream(filePath));
-        doc.fontSize(16).text('Reporte de Pedidos por Cliente', { align: 'center' });
-        doc.moveDown();
-        result.rows.forEach(row => {
-            doc.fontSize(12).text(`Cliente: ${row.cliente}`);
-            doc.text(`Código: ${row.codigo}`);
-            doc.text(`Fecha y Hora de Solicitud: ${Date(row.fechaYHoraDeSolicitud)}`);
-            doc.text(`Origen: ${row.origen}`);
-            doc.text(`Destino: ${row.destino}`);
-            doc.text(`Descripción: ${row.descripcion}`);
+// Generar reporte de servicios por cliente
+app.get('/reportes/servicios-por-cliente', (req, res) => {
+    const { clienteId, mes, ano } = req.query;
+    connect((err, client, done) => {
+        if (err) return res.status(500).send(err.message);
+        client.query(`SELECT * FROM servicio WHERE cIdentificacion = $1 AND EXTRACT(MONTH FROM fechaYHoraDeSolicitud) = $2 AND EXTRACT(YEAR FROM fechaYHoraDeSolicitud) = $3`, 
+                     [clienteId, mes, ano], (err, result) => {
+            done();
+            if (err) return res.status(500).send(err.message);
+            const doc = new PDFDocument();
+            res.setHeader('Content-Disposition', `attachment; filename=reporte_servicios_cliente_${clienteId}_${mes}_${ano}.pdf`);
+            doc.pipe(res);
+            doc.fontSize(18).text(`Reporte de Servicios del Cliente ${clienteId} para ${mes}/${ano}`, { align: 'center' });
             doc.moveDown();
-        });
-        doc.end();
-
-        doc.on('finish', function() {
-            res.download(filePath, 'reportePedidosPorCliente.pdf', function(err) {
-                if (err) {
-                    console.error('Error downloading the file:', err);
-                    res.status(500).send('Error al generar el reporte.');
-                } else {
-                    fs.unlinkSync(filePath);  // Eliminar el archivo después de que se haya descargado
-                }
+            result.rows.forEach(row => {
+                doc.fontSize(12).text(`Código: ${row.codigo}`);
+                doc.text(`Fecha y Hora de Solicitud: ${row.fechayhoradesolicitud}`);
+                doc.text(`Origen: ${row.origen}`);
+                doc.text(`Destino: ${row.destino}`);
+                doc.text(`Descripción: ${row.descripcion}`);
+                doc.text(`Número de Paquetes: ${row.numerodepaquetes}`);
+                doc.text(`Tipo de Transporte: ${row.tipodetransporte}`);
+                doc.text(`Estado: ${row.estado}`);
+                doc.text(`Fecha y Hora del Estado: ${row.fechayhoradelestado}`);
+                doc.text('-----------------------');
             });
+            doc.end();
         });
-    } catch (err) {
-        console.error('Error querying the database:', err);
-        res.status(500).send('Internal server error');
-    }
+    });
 });
 
-// Ruta para generar reporte de pedidos atendidos por mensajero en un mes especificado
-app.get('/reportePedidosPorMensajero', async (req, res) => {
-    const { mes, anio } = req.query;
-    const query = `
-        SELECT m.nombre AS mensajero, s.codigo, s.fechaYHoraDeSolicitud, s.origen, s.destino, s.descripcion
-        FROM servicio s
-        JOIN mensajero m ON s.mIdentificacion = m.identificacion
-        WHERE EXTRACT(MONTH FROM s.fechaYHoraDeSolicitud) = $1
-        AND EXTRACT(YEAR FROM s.fechaYHoraDeSolicitud) = $2
-        ORDER BY m.nombre, s.fechaYHoraDeSolicitud
-    `;
-
-    try {
-        const result = await pool.query(query, [mes, anio]);
-        const doc = new PDFDocument();
-        const filePath = path.join(__dirname, 'reportePedidosPorMensajero.pdf');
-
-        doc.pipe(fs.createWriteStream(filePath));
-        doc.fontSize(16).text('Reporte de Pedidos por Mensajero', { align: 'center' });
-        doc.moveDown();
-        result.rows.forEach(row => {
-            doc.fontSize(12).text(`Mensajero: ${row.mensajero}`);
-            doc.text(`Código: ${row.codigo}`);
-            doc.text(`Fecha y Hora de Solicitud: ${date(row.fechaYHoraDeSolicitud)}`);
-            doc.text(`Origen: ${row.origen}`);
-            doc.text(`Destino: ${row.destino}`);
-            doc.text(`Descripción: ${row.descripcion}`);
+// Generar reporte de servicios por mensajero
+app.get('/reportes/servicios-por-mensajero', (req, res) => {
+    const { mensajeroId, mes, ano } = req.query;
+    connect((err, client, done) => {
+        if (err) return res.status(500).send(err.message);
+        client.query(`SELECT * FROM servicio WHERE mIdentificacion = $1 AND EXTRACT(MONTH FROM fechaYHoraDeSolicitud) = $2 AND EXTRACT(YEAR FROM fechaYHoraDeSolicitud) = $3`, 
+                     [mensajeroId, mes, ano], (err, result) => {
+            done();
+            if (err) return res.status(500).send(err.message);
+            const doc = new PDFDocument();
+            res.setHeader('Content-Disposition', `attachment; filename=reporte_servicios_mensajero_${mensajeroId}_${mes}_${ano}.pdf`);
+            doc.pipe(res);
+            doc.fontSize(18).text(`Reporte de Servicios del Mensajero ${mensajeroId} para ${mes}/${ano}`, { align: 'center' });
             doc.moveDown();
-        });
-        doc.end();
-
-        doc.on('finish', function() {
-            res.download(filePath, 'reportePedidosPorMensajero.pdf', function(err) {
-                if (err) {
-                    console.error('Error downloading the file:', err);
-                    res.status(500).send('Error al generar el reporte.');
-                } else {
-                    fs.unlinkSync(filePath);  // Eliminar el archivo después de que se haya descargado
-                }
+            result.rows.forEach(row => {
+                doc.fontSize(12).text(`Código: ${row.codigo}`);
+                doc.text(`Fecha y Hora de Solicitud: ${row.fechayhoradesolicitud}`);
+                doc.text(`Origen: ${row.origen}`);
+                doc.text(`Destino: ${row.destino}`);
+                doc.text(`Descripción: ${row.descripcion}`);
+                doc.text(`Número de Paquetes: ${row.numerodepaquetes}`);
+                doc.text(`Tipo de Transporte: ${row.tipodetransporte}`);
+                doc.text(`Estado: ${row.estado}`);
+                doc.text(`Fecha y Hora del Estado: ${row.fechayhoradelestado}`);
+                doc.text('-----------------------');
             });
+            doc.end();
         });
-    } catch (err) {
-        console.error('Error querying the database:', err);
-        res.status(500).send('Internal server error');
-    }
+    });
 });
-
 
 // Iniciar el servidor
 app.listen(3000, () => {
