@@ -292,26 +292,18 @@ function monitorService() {
         });
 }
 
-// Función para generar el reporte de pedidos por cliente
-function generarReportePedidosPorCliente() {
-    const mes = document.getElementById('mesCliente').value;
-    const anio = document.getElementById('anioCliente').value;
+function generateClientReport() {
+    var clienteId = document.getElementById('report_cliente_id').value;
+    var mes = document.getElementById('report_mes').value;
+    var ano = document.getElementById('report_ano').value;
 
-    if (mes && anio) {
-        window.location.href = `/reportePedidosPorCliente?mes=${mes}&anio=${anio}`;
-    } else {
-        alert('Por favor, ingrese el mes y el año.');
-    }
+    window.open(`/reportes/servicios-por-cliente?clienteId=${clienteId}&mes=${mes}&ano=${ano}`, '_blank');
 }
 
-// Función para generar el reporte de pedidos por mensajero
-function generarReportePedidosPorMensajero() {
-    const mes = document.getElementById('mesMensajero').value;
-    const anio = document.getElementById('anioMensajero').value;
+function generateMensajeroReport() {
+    var mensajeroId = document.getElementById('report_mensajero_id').value;
+    var mes = document.getElementById('report_mes_mensajero').value;
+    var ano = document.getElementById('report_ano_mensajero').value;
 
-    if (mes && anio) {
-        window.location.href = `/reportePedidosPorMensajero?mes=${mes}&anio=${anio}`;
-    } else {
-        alert('Por favor, ingrese el mes y el año.');
-    }
+    window.open(`/reportes/servicios-por-mensajero?mensajeroId=${mensajeroId}&mes=${mes}&ano=${ano}`, '_blank');
 }
