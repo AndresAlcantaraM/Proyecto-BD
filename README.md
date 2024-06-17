@@ -12,7 +12,7 @@ Despues de crear el servidor de la base de datos mediante la conexión al conten
     password: "pg123",
     host: "tu dirección ip aquí",
 ```
-Ahora estando dentro de la carpeta raíz del proyecto instalamos todas las dependencias necesarias e iniciamos el servidor:
+Ahora estando dentro de la carpeta raíz del proyecto instalamos todas las dependencias necesarias e iniciamos el servidor(debe descargar previamente Node.js):
 ```sh
 cd backend
 npm install
