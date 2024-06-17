@@ -17,6 +17,7 @@ Ahora estando dentro de la carpeta raíz del proyecto instalamos todas las depen
 cd backend
 npm install
 npm install pdfkit
+npm install express@4.19.2
 npm install wkhtmltopdf
 node index.js
 ```
