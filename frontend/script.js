@@ -16,7 +16,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
             if (response.ok) {
                 return response.json(); // Parseamos la respuesta JSON
             } else {
-                throw new Error('Invalid credentials');
+                throw new Error('Usuario o contraseña incorrectos');
             }
         })
         .then(data => {
