@@ -2,7 +2,9 @@
 Proyecto final de Bases de Datos
 
 Integrantes:
+
 Andrés Felipe Alcántara Muñoz 2242517
+
 Miguel Ángel Salcedo Urian 2242786
 ## Inicialización
 Una vez dentro de la carpeta raíz del proyecto procedemos a crear el contenedor para la base de datos (debe tener Docker en ejecución):
