@@ -9,8 +9,8 @@ const PDFDocument = require('pdfkit');
 const config = {
     user: "postgres",
     database: "postgres",
-    password: "1234",
-    host: "172.25.98.220",
+    password: "pg123",
+    host: "192.168.1.6",
     port: 5432,
     max: 10,
     idleTimeoutMillis: 30000,
@@ -51,11 +51,11 @@ app.post('/login', async (req, res) => {
             const user = result.rows[0];
             res.status(200).json({ message: 'Login successful', role: user.rol });
         } else {
-            res.status(401).send('Invalid credentials');
+            res.status(401).send('Usuario o contraseña incorrectos');
         }
     } catch (err) {
         console.error('Error querying the database:', err);
-        res.status(500).send('Internal server error');
+        res.status(500).send('Error del servidor');
     }
 });
 
@@ -127,7 +127,7 @@ app.post('/addCourier', (req, res) => {
                      (err) => {
                          done();
                          if (err) return res.status(500).send(err.message);
-                         res.status(200).send('Courier added');
+                         res.status(200).send('Mensajero añadido');
                      });
     });
 });
@@ -193,7 +193,7 @@ app.post('/addService', (req, res) => {
             if (err) {
                 return res.status(500).send(err.message);
             }
-            res.status(200).send('Service added');
+            res.status(200).send('Servicio añadido');
         });
     });
 });
@@ -207,7 +207,7 @@ app.post('/addUser', (req, res) => {
                      (err) => {
                          done();
                          if (err) return res.status(500).send(err.message);
-                         res.status(200).send('User added');
+                         res.status(200).send('Usuario añadido');
                      });
     });
 });
