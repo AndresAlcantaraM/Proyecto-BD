@@ -52,6 +52,8 @@ function showClientDashboard() {
     document.querySelector('button[onclick="showSection(\'userSection\')"]').style.display = 'none';
     document.querySelector('button[onclick="showSection(\'modifySection\')"]').style.display = 'none';
     document.querySelector('button[onclick="showSection(\'searchSection\')"]').style.display = 'none';
+    document.querySelector('button[onclick="showSection(\'AsignarMensajeroSection\')"]').style.display = 'none';
+    document.querySelector('button[onclick="showSection(\'adminReports\')"]').style.display = 'none';
 }
 
 function hideAllSections() {
@@ -98,6 +100,38 @@ function clearClientForm() {
     document.getElementById('client_city').value = '';
     document.getElementById('client_email').value = '';
     document.getElementById('client_phone').value = '';
+
+    document.getElementById('courier_id').value = '';
+    document.getElementById('courier_name').value = '';
+    document.getElementById('courier_address').value = '';
+    document.getElementById('courier_email').value = '';
+    document.getElementById('courier_phone').value = '';
+    document.getElementById('courier_transport').value = '';
+
+    document.getElementById('service_code').value = '';
+    document.getElementById('Id_Mensajero').value = '';
+    document.getElementById('Id_Cliente').value = '';
+
+    document.getElementById('service_code_r').value = '';
+    document.getElementById('service_date').value = '';
+    document.getElementById('service_time').value = '';
+    document.getElementById('service_origin').value = '';
+    document.getElementById('service_destination').value = '';
+    document.getElementById('service_description').value = '';
+    document.getElementById('service_transport').value = '';
+    document.getElementById('service_packages').value = '';
+    document.getElementById('Id_Client').value = '';
+
+    document.getElementById('user_login').value = '';
+    document.getElementById('user_password').value = '';
+    document.getElementById('user_address').value = '';
+    document.getElementById('user_email').value = '';
+    document.getElementById('user_phone').value = '';
+
+    document.getElementById('codeS').value = '';
+    document.getElementById('codeM').value = '';
+    document.getElementById('modify_service_status').value = '';
+
 }
 
 function searchClient() {
