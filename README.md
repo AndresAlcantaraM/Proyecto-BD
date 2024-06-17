@@ -1,6 +1,6 @@
 # Proyecto-BD
 Proyecto final de Bases de Datos
-##Inicialización
+## Inicialización
 Una vez dentro de la carpeta raíz del proyecto procedemos a crear el contenedor para la base de datos (debe tener Docker en ejecución):
 ```sh
 cd database
@@ -21,7 +21,7 @@ npm install wkhtmltopdf
 node index.js
 ```
 Finalmente accedemos desde nuestro navegador a localhost:3000.
-##¿Como acceder a la aplicación?
+## ¿Como acceder a la aplicación?
 Para acceder a la aplicación se disponen de unas credenciales para usuario de tipo cliente y de tipo administrador en la base de datos, no obstante los encontraras a continuación:
 ```sh
 Usuarios:
