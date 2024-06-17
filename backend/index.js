@@ -10,7 +10,7 @@ const config = {
     user: "postgres",
     database: "postgres",
     password: "pg123",
-    host: "192.168.1.6",
+    host: "tu dirección ip aquí",
     port: 5432,
     max: 10,
     idleTimeoutMillis: 30000,
