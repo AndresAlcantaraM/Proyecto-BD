@@ -29,5 +29,5 @@ login: user1, contraseña: password1.
 login: user2, contraseña: password2.
 Administradores:
 login: admin1, contraseña 1234.
-login: admin2, contraseña 5678
+login: admin2, contraseña 5678.
 ```
